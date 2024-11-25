@@ -43,18 +43,23 @@ function deleteFromTodoList(button, div, todoList, todoText) {
         const index = todos.todoList.indexOf(todoText);
         
         todos.todoList[index] = '';
+
+        let a1 = todos.todoList.filter(function (e) {
+            return e; // Returns only the truthy values
+        });
+
+        todos.todoList = a1;
         
         localStorage.setItem("todos", JSON.stringify(todos));
 
-        
         //Delete the div from List
         todoList.removeChild(div);
     });
 }
 
-
 function checkBoxListener(button,checkBox, todoText, div) {
     checkBox.addEventListener("change", () => {
+        
         
         // Handle checked state
         if (checkBox.checked) {
@@ -69,7 +74,7 @@ function checkBoxListener(button,checkBox, todoText, div) {
             div.appendChild(checkBox); // Reuse the same checkbox
             div.appendChild(strike);
             div.appendChild(button);
-
+            
 
         } else {
             // Remove strikethrough for incomplete task
@@ -81,7 +86,7 @@ function checkBoxListener(button,checkBox, todoText, div) {
             div.appendChild(checkBox); // Reuse the same checkbox
             div.appendChild(li);
             div.appendChild(button);
-           
+            
         }
     });
 }
