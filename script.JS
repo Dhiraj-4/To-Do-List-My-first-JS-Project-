@@ -13,20 +13,35 @@ function appendTodoInHtml(todoText) {
     if(todoText == '') {
         return;
     }
-    const todoList = document.getElementById("ToDoList");
 
+    const todoList = document.getElementById("ToDoList");
+    
     const todo = document.createElement("li");
-    todo.textContent = todoText;
     const checkBox = document.createElement("input");
     checkBox.type = "checkbox";
-
     const div = document.createElement("div");
-
     const button = document.createElement("button");
     button.textContent = "Delete";
 
     div.appendChild(checkBox);
-    div.appendChild(todo);
+
+    if(todoText.slice(todoText.length-1, todoText.length) == "_") {
+        console.log("This one is marked: ", todoText);
+        
+        todo.textContent = todoText.slice(0, -1);
+        checkBox.checked = true;
+
+        const strike = document.createElement("s");
+        strike.appendChild(todo);
+        div.appendChild(strike);
+        
+    } else {
+        console.log("This one is Unmarked: ", todoText);
+        // console.log("Why the fuck");
+        todo.textContent = todoText;
+        div.appendChild(todo);
+    }
+    
     div.appendChild(button);
     todoList.appendChild(div);
 
@@ -57,6 +72,23 @@ function deleteFromTodoList(button, div, todoList, todoText) {
     });
 }
 
+function markStrikedInLocalStorage(todoText){
+    const todos = loadTodos();
+    const index = todos.todoList.indexOf(todoText);
+    todos.todoList[index] = todoText + "_";
+    
+    console.log("I markStriked has been called and adding value: ", todos.todoList[index]);
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+function unmarkStrikedInLocalStorage(todoText) {
+    const todos = loadTodos();
+    const index = todos.todoList.indexOf(todoText);
+    todos.todoList[index] = todoText.slice(0, -1);
+
+    console.log("I unmarkStriked has been called and adding value: ", todos.todoList[index]);
+    localStorage.setItem("todos", JSON.stringify(todos));
+}
 function checkBoxListener(button,checkBox, todoText, div) {
     checkBox.addEventListener("change", () => {
         
@@ -74,7 +106,8 @@ function checkBoxListener(button,checkBox, todoText, div) {
             div.appendChild(checkBox); // Reuse the same checkbox
             div.appendChild(strike);
             div.appendChild(button);
-            
+            console.log("I am calling markStriked");
+            markStrikedInLocalStorage(todoText);
 
         } else {
             // Remove strikethrough for incomplete task
@@ -86,7 +119,8 @@ function checkBoxListener(button,checkBox, todoText, div) {
             div.appendChild(checkBox); // Reuse the same checkbox
             div.appendChild(li);
             div.appendChild(button);
-            
+            console.log("I am calling unmarkStriked");
+            unmarkStrikedInLocalStorage(todoText);
         }
     });
 }
@@ -121,4 +155,5 @@ document.addEventListener("DOMContentLoaded",() => {
 
     todos.todoList.forEach(todo => appendTodoInHtml(todo));
 });
-
+// const x = "Hello";
+// console.log(x.slice(0, -1));
