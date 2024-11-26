@@ -95,6 +95,29 @@ function checkBoxListener(checkBox,delBtn, todo) {
     });
 }
 
+function executeFilterAction(event) {
+    const todos = loadTodos();
+    const element = event.target;
+    const value = element.getAttribute("data-filter");
+    const todoList = document.getElementById("ToDoList");
+    todoList.innerHTML = '';
+
+    if(value == 'complete') {
+        todos.todoList.forEach(todo => {
+            if(todo.isComplete == true) {
+                appendTodoInHtml(todo);
+            }
+        });
+    } else if(value == 'pending') {
+        todos.todoList.forEach(todo => {
+            if(todo.isComplete == false) {
+                appendTodoInHtml(todo);
+            }
+        });
+    } else {
+        todos.todoList.forEach(todo => appendTodoInHtml(todo));
+    }
+}
 
 document.addEventListener("DOMContentLoaded",() => {
 
@@ -102,7 +125,11 @@ document.addEventListener("DOMContentLoaded",() => {
 
     const summitBtn = document.getElementById("ToDo-btn");
 
-    const todoList = document.getElementById("ToDoList");
+    const filterBtns = document.getElementsByClassName("filterBtn");
+
+    for(const btn of filterBtns) {
+        btn.addEventListener("click", executeFilterAction);
+    }
 
     summitBtn.addEventListener('click', () => {
         const todoText = inputTodo.value;
