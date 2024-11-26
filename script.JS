@@ -49,7 +49,71 @@ function appendTodoInHtml(todo) {
 
     checkBoxListener(checkBox, delBtn, todo);
     deleteFromTodoList(delBtn, checkBoxTaskWapper, btnWapper, todo );
+    editTask(editBtn,checkBoxTaskWapper,todo,task);
+}
 
+//Method One status: works completly fine
+
+// function editTask(editBtn, todo, task) {
+//     editBtn.addEventListener('click', () => {
+//         todo.text = prompt("Enter the edited task: ");
+//         task.textContent = todo.text;
+//     })
+// }
+
+//Method two : Works wonderfully!
+function editTask(editBtn,checkBoxTaskWapper,todo,task) {
+    editBtn.addEventListener('click', () => {
+        const newtask = document.createElement('input');
+        newtask.value = todo.text;
+
+        const newAddBtn = document.createElement('button');
+        newAddBtn.textContent = "UpdateTodo";
+
+        checkBoxTaskWapper.appendChild(newAddBtn);
+        checkBoxTaskWapper.replaceChild(newtask,task);
+
+        UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task);
+    })
+}
+
+function UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task) {
+
+    newAddBtn.addEventListener('click', () => {
+
+        if(newtask.value == ''){
+            alert("Please enter something for Todo");
+        } else {
+            
+            task.textContent = replaceTodoText(todo, newtask);;
+            checkBoxTaskWapper.replaceChild(task, newtask);
+            checkBoxTaskWapper.removeChild(newAddBtn);
+        }
+    });
+
+    function replaceTodoText(todo, newtask) {
+        const todos = loadTodos();
+
+        const index = todos.todoList.findIndex(x => x.text === todo.text);
+
+        console.log("todo.text: ", todo.text," new todo.text: ", newtask.value);
+        console.log(todos.todoList[index]);
+
+        todo.text = newtask.value;
+
+        console.log(todo);
+        todos.todoList[index] = todo;
+
+        localStorage.setItem("todos",JSON.stringify(todos));
+
+        return todo.text;
+    }
+
+    newtask.addEventListener("change", (event) => {
+        const inputText = event.target.value;
+
+        event.target.value = inputText.trim();
+    })
 }
 
 function deleteFromTodoList(delBtn, checkBoxTaskWapper, btnWapper, todo ) {
