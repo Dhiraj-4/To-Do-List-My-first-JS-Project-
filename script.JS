@@ -3,60 +3,63 @@ function loadTodos(){
     return todos;
 }
 
-function addTodoToLocalStorage(todoText) {
+function addTodoToLocalStorage(todo) {
     const todos = loadTodos();
-    todos.todoList.push(todoText);
+    todos.todoList.push(todo);
     localStorage.setItem("todos", JSON.stringify(todos));
 }
 
-function appendTodoInHtml(todoText) {
-    if(todoText == '') {
-        return;
-    }
-
+function appendTodoInHtml(todo) {
+    
     const todoList = document.getElementById("ToDoList");
-    
-    const todo = document.createElement("li");
+
+    const task = document.createElement("li");
+    console.log(todo.text,"The content that will be added in li");
+    task.textContent = todo.text;
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Delete";
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+
     const checkBox = document.createElement("input");
-    checkBox.type = "checkbox";
-    const div = document.createElement("div");
-    const button = document.createElement("button");
-    button.textContent = "Delete";
+    checkBox.type = 'checkbox';
 
-    div.appendChild(checkBox);
+    const checkBoxTaskWapper = document.createElement("div");
 
-    if(todoText.slice(todoText.length-1, todoText.length) == "_") {
-        console.log("This one is marked: ", todoText);
-        
-        todo.textContent = todoText.slice(0, -1);
+    const btnWapper = document.createElement("div");
+
+    checkBoxTaskWapper.appendChild(checkBox);
+
+    if(todo.isComplete == true) {
         checkBox.checked = true;
-
-        const strike = document.createElement("s");
-        strike.appendChild(todo);
-        div.appendChild(strike);
-        
+        const strike = document.createElement('s');
+        strike.appendChild(task);
+        checkBoxTaskWapper.appendChild(strike);
     } else {
-        console.log("This one is Unmarked: ", todoText);
-        // console.log("Why the fuck");
-        todo.textContent = todoText;
-        div.appendChild(todo);
+        checkBoxTaskWapper.appendChild(task);
     }
-    
-    div.appendChild(button);
-    todoList.appendChild(div);
 
-    checkBoxListener(button,checkBox,todoText,div);
-    deleteFromTodoList(button,div,todoList,todoText);
+    btnWapper.appendChild(editBtn);
+    btnWapper.appendChild(delBtn);
+
+    todoList.appendChild(checkBoxTaskWapper);
+    todoList.appendChild(btnWapper);
+
+    checkBoxListener(checkBox, delBtn, todo);
+    deleteFromTodoList(delBtn, checkBoxTaskWapper, btnWapper, todo );
+
 }
 
-function deleteFromTodoList(button, div, todoList, todoText) {
-    button.addEventListener("click", () => {
+function deleteFromTodoList(delBtn, checkBoxTaskWapper, btnWapper, todo ) {
+    delBtn.addEventListener("click", () => {
         
         // Update localStorage
         const todos = loadTodos();
         
-        const index = todos.todoList.indexOf(todoText);
-        
+        const index = todos.todoList.findIndex(x => x.text === todo.text);
+
         todos.todoList[index] = '';
 
         let a1 = todos.todoList.filter(function (e) {
@@ -68,59 +71,26 @@ function deleteFromTodoList(button, div, todoList, todoText) {
         localStorage.setItem("todos", JSON.stringify(todos));
 
         //Delete the div from List
-        todoList.removeChild(div);
+        const todoList = document.getElementById("ToDoList");
+        todoList.removeChild(checkBoxTaskWapper);
+        todoList.removeChild(btnWapper);
     });
 }
 
-function markStrikedInLocalStorage(todoText){
-    const todos = loadTodos();
-    const index = todos.todoList.indexOf(todoText);
-    todos.todoList[index] = todoText + "_";
-    
-    console.log("I markStriked has been called and adding value: ", todos.todoList[index]);
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-
-function unmarkStrikedInLocalStorage(todoText) {
-    const todos = loadTodos();
-    const index = todos.todoList.indexOf(todoText);
-    todos.todoList[index] = todoText.slice(0, -1);
-
-    console.log("I unmarkStriked has been called and adding value: ", todos.todoList[index]);
-    localStorage.setItem("todos", JSON.stringify(todos));
-}
-function checkBoxListener(button,checkBox, todoText, div) {
+function checkBoxListener(checkBox,delBtn, todo) {
     checkBox.addEventListener("change", () => {
-        
-        
         // Handle checked state
         if (checkBox.checked) {
-            // Add strikethrough for completed task
-            const strike = document.createElement("s");
-            const li = document.createElement("li");
-            li.textContent = todoText;
-            strike.appendChild(li);
-
-            // Replace existing content in div
-            div.innerHTML = ""; // Clear current children
-            div.appendChild(checkBox); // Reuse the same checkbox
-            div.appendChild(strike);
-            div.appendChild(button);
-            console.log("I am calling markStriked");
-            markStrikedInLocalStorage(todoText);
-
+            todo.isComplete = true;
+            
+            appendTodoInHtml(todo);
+            addTodoToLocalStorage(todo);
+            delBtn.click();
         } else {
-            // Remove strikethrough for incomplete task
-            const li = document.createElement("li");
-            li.textContent = todoText;
-
-            // Replace existing content in div
-            div.innerHTML = ""; // Clear current children
-            div.appendChild(checkBox); // Reuse the same checkbox
-            div.appendChild(li);
-            div.appendChild(button);
-            console.log("I am calling unmarkStriked");
-            unmarkStrikedInLocalStorage(todoText);
+            todo.isComplete = false;
+            appendTodoInHtml(todo);
+            addTodoToLocalStorage(todo);
+            delBtn.click();
         }
     });
 }
@@ -134,14 +104,14 @@ document.addEventListener("DOMContentLoaded",() => {
 
     const todoList = document.getElementById("ToDoList");
 
-    summitBtn.addEventListener('click', (event) => {
+    summitBtn.addEventListener('click', () => {
         const todoText = inputTodo.value;
-
+        console.log(todoText);  
         if(todoText == ''){
             alert("Please enter something for Todo");
         } else {
-            addTodoToLocalStorage(todoText);
-            appendTodoInHtml(todoText);
+            addTodoToLocalStorage({text: todoText, isComplete: false});
+            appendTodoInHtml({text: todoText, isComplete: false});
             inputTodo.value = '';
         }
     });
@@ -155,5 +125,3 @@ document.addEventListener("DOMContentLoaded",() => {
 
     todos.todoList.forEach(todo => appendTodoInHtml(todo));
 });
-// const x = "Hello";
-// console.log(x.slice(0, -1));
