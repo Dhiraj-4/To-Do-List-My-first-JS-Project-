@@ -32,9 +32,9 @@ function appendTodoInHtml(todo) {
 
     checkBoxTaskWapper.appendChild(checkBox);
 
+    const strike = document.createElement('s');
     if(todo.isComplete == true) {
         checkBox.checked = true;
-        const strike = document.createElement('s');
         strike.appendChild(task);
         checkBoxTaskWapper.appendChild(strike);
     } else {
@@ -49,7 +49,7 @@ function appendTodoInHtml(todo) {
 
     checkBoxListener(checkBox, delBtn, todo);
     deleteFromTodoList(delBtn, checkBoxTaskWapper, btnWapper, todo );
-    editTask(editBtn,checkBoxTaskWapper,todo,task);
+    editTask(editBtn,checkBoxTaskWapper,todo,task,strike);
 }
 
 //Method One status: works completly fine
@@ -62,30 +62,33 @@ function appendTodoInHtml(todo) {
 // }
 
 //Method two : Works wonderfully!
-function editTask(editBtn,checkBoxTaskWapper,todo,task) {
+function editTask(editBtn,checkBoxTaskWapper,todo,task,strike) {
     let count = 0;
     editBtn.addEventListener('click', () => {
         count = 1;
         const newtask = document.createElement('input');
         newtask.value = todo.text;
 
-        checkBoxTaskWapper.replaceChild(newtask,task);
+        if(todo.isComplete == true) {
+            strike.replaceChild(newtask,task);
+        } else {
+            checkBoxTaskWapper.replaceChild(newtask,task);
+        }
         if(count % 2 != 0) {
             const newAddBtn = document.createElement('button');
             newAddBtn.textContent = "UpdateTodo";
 
             checkBoxTaskWapper.appendChild(newAddBtn); 
-            UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task);
+            UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper, task, strike);
             count = 2;
         } else {
             checkBoxTaskWapper.removeChild(newAddBtn);
         }
         
-        
     })
 }
 
-function UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task) {
+function UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper, task, strike) {
 
     newAddBtn.addEventListener('click', () => {
 
@@ -94,7 +97,11 @@ function UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task) {
         } else {
             
             task.textContent = replaceTodoText(todo, newtask);;
-            checkBoxTaskWapper.replaceChild(task, newtask);
+            if(todo.isComplete == true) {
+                strike.replaceChild(task, newtask);
+            } else {
+                checkBoxTaskWapper.replaceChild(task, newtask);
+            }
             checkBoxTaskWapper.removeChild(newAddBtn);
         }
     });
