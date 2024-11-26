@@ -63,17 +63,24 @@ function appendTodoInHtml(todo) {
 
 //Method two : Works wonderfully!
 function editTask(editBtn,checkBoxTaskWapper,todo,task) {
+    let count = 0;
     editBtn.addEventListener('click', () => {
+        count++;
         const newtask = document.createElement('input');
         newtask.value = todo.text;
 
-        const newAddBtn = document.createElement('button');
-        newAddBtn.textContent = "UpdateTodo";
-
-        checkBoxTaskWapper.appendChild(newAddBtn);
         checkBoxTaskWapper.replaceChild(newtask,task);
+        if(count % 2 != 0) {
+            const newAddBtn = document.createElement('button');
+            newAddBtn.textContent = "UpdateTodo";
 
-        UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task);
+            checkBoxTaskWapper.appendChild(newAddBtn); 
+            UpdateTodoText(todo, newAddBtn, newtask, checkBoxTaskWapper,task);
+        } else {
+            checkBoxTaskWapper.removeChild(newAddBtn);
+        }
+        
+        
     })
 }
 
